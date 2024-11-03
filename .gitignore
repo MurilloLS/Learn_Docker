@@ -1,0 +1,29 @@
+# Diretórios e arquivos gerados
+bin/
+obj/
+*.sln.ide/
+
+# Arquivos de configuração de ambiente
+appsettings.Development.json
+appsettings.json
+
+# Arquivos de log
+*.log
+
+# Diretório de pacotes
+packages/
+
+# Arquivos de banco de dados locais
+*.db
+*.mdf
+*.ldf
+
+# Contêineres Docker
+*.dockerignore
+docker-compose.override.yml
+
+# Outros
+*.user
+*.suo
+*.swp
+*.tmp
