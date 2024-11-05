@@ -1,4 +1,4 @@
-# Learn Docker
+# 🐋Learn Docker
 
 ## Descrição
 Este repositório é dedicado ao aprendizado e prática de Docker com um projeto simples em ASP.NET Core.
