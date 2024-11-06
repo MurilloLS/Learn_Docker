@@ -38,3 +38,36 @@ Este repositório é dedicado ao aprendizado e prática de Docker com um projeto
      ```
   4. **Verifiquei se o contêiner estava em execução** e acessei a aplicação com sucesso.
 
+## Dia 3 - Atualizando o Dockerfile e Acessando o Contêiner com Bash
+
+- **Objetivo:** Modificar o `Dockerfile` para adicionar o `bash`, recriar o contêiner e explorar o contêiner.
+- **Passos:**
+  1. Atualizei o `Dockerfile` para incluir o bash:
+     ```Dockerfile
+     # Usando a imagem base do SDK do .NET para build
+     FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
+     WORKDIR /app
+     COPY . .
+     RUN dotnet publish -c Release -o out
+
+     # Usando a imagem base do Runtime do .NET
+     FROM mcr.microsoft.com/dotnet/aspnet:8.0
+     WORKDIR /app
+     RUN apt-get update && apt-get install -y bash
+     COPY --from=build /app/out .
+     EXPOSE 80
+     ENTRYPOINT ["dotnet", "MeuAppDocker.dll"]
+     ```
+  2. Reconstruí a imagem Docker:
+     ```bash
+     docker build -t meuappdocker .
+     ```
+  3. Recriei o contêiner:
+     ```bash
+     docker rm -f meuappcontainer
+     docker run -d -p 8080:80 --name meuappcontainer meuappdocker
+     ```
+  4. Acessei o contêiner com o comando:
+     ```bash
+     docker exec -it meuappcontainer /bin/bash
+     ```
