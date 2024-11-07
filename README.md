@@ -40,7 +40,7 @@ Este repositório é dedicado ao aprendizado e prática de Docker com um projeto
 
 ## Dia 3 - Atualizando o Dockerfile e Acessando o Contêiner com Bash
 
-- **Objetivo:** Modificar o `Dockerfile` para adicionar o `bash`, recriar o contêiner e explorar o contêiner.
+- **Objetivo:** Modificar o `Dockerfile` para adicionar o bash, recriar o contêiner e explorar o contêiner.
 - **Passos:**
   1. Atualizei o `Dockerfile` para incluir o bash:
      ```Dockerfile
@@ -71,3 +71,33 @@ Este repositório é dedicado ao aprendizado e prática de Docker com um projeto
      ```bash
      docker exec -it meuappcontainer /bin/bash
      ```
+
+## Dia 4 - Configurando Variáveis de Ambiente
+
+- **Objetivo:** Entender como configurar variáveis de ambiente dentro do Docker para tornar a aplicação mais flexível.
+- **Passos:**
+  1. **Atualizei o Dockerfile** para incluir variáveis de ambiente:
+     ```Dockerfile
+     FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
+     WORKDIR /app
+     COPY . .
+     RUN dotnet publish -c Release -o out
+
+     FROM mcr.microsoft.com/dotnet/aspnet:8.0
+     WORKDIR /app
+     ENV ASPNETCORE_ENVIRONMENT=Production
+     COPY --from=build /app/out .
+     EXPOSE 80
+     ENTRYPOINT ["dotnet", "MeuAppDocker.dll"]
+     ```
+  2. **Reconstruí a imagem e recriei o contêiner**:
+     ```bash
+     docker build -t meuappdocker .
+     docker rm -f meuappcontainer
+     docker run -d -p 8080:80 --name meuappcontainer meuappdocker
+     ```
+  3. **Verifiquei a variável de ambiente dentro do contêiner**:
+     ```bash
+     docker exec -it meuappcontainer printenv ASPNETCORE_ENVIRONMENT
+     ```
+     - O valor retornado foi `Production`, confirmando que a variável foi configurada.
