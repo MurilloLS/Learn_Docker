@@ -101,3 +101,23 @@ Este repositório é dedicado ao aprendizado e prática de Docker com um projeto
      docker exec -it meuappcontainer printenv ASPNETCORE_ENVIRONMENT
      ```
      - O valor retornado foi `Production`, confirmando que a variável foi configurada.
+
+## Dia 5 - Persistindo Dados com Volumes
+
+- **Objetivo:** Configurar volumes para persistir dados fora do contêiner e entender como manter os dados entre reinicializações.
+- **Passos:**
+  1. **Configurei um volume** ao iniciar o contêiner para que os dados sejam persistidos no host:
+     ```bash
+     docker run -d -p 8080:80 --name meuappcontainer -v $(pwd)/appdata:/app/data meuappdocker
+     ```
+  2. **Criei um diretório `/app/data`** dentro do contêiner para armazenar os dados persistentes da aplicação.
+  3. **Testei a persistência de dados** criando um arquivo de teste dentro do contêiner:
+     ```bash
+     docker exec -it meuappcontainer touch /app/data/teste.txt
+     ```
+  4. **Verifiquei a persistência** ao remover e recriar o contêiner:
+     ```bash
+     docker rm -f meuappcontainer
+     docker run -d -p 8080:80 --name meuappcontainer -v $(pwd)/appdata:/app/data meuappdocker
+     ```
+  5. O arquivo `teste.txt` permaneceu na pasta `appdata` no host, confirmando que o volume foi configurado corretamente.
