@@ -26,7 +26,7 @@ Este repositório é dedicado ao aprendizado e prática de Docker com um projeto
 ## Dia 2 - Lidando com Contêineres e Erros
 
 - **Objetivo:** Aprender a gerenciar contêineres e resolver problemas comuns.
-- **Principais Ações:**
+- **Passos Realizados:**
   1. **Verifiquei os contêineres em execução** com `docker ps`.
   2. **Resolvi um problema de contêiner zumbi** usando:
      ```bash
@@ -41,7 +41,7 @@ Este repositório é dedicado ao aprendizado e prática de Docker com um projeto
 ## Dia 3 - Atualizando o Dockerfile e Acessando o Contêiner com Bash
 
 - **Objetivo:** Modificar o `Dockerfile` para adicionar o bash, recriar o contêiner e explorar o contêiner.
-- **Passos:**
+- **Passos Realizados:**
   1. Atualizei o `Dockerfile` para incluir o bash:
      ```Dockerfile
      # Usando a imagem base do SDK do .NET para build
@@ -75,7 +75,7 @@ Este repositório é dedicado ao aprendizado e prática de Docker com um projeto
 ## Dia 4 - Configurando Variáveis de Ambiente
 
 - **Objetivo:** Entender como configurar variáveis de ambiente dentro do Docker para tornar a aplicação mais flexível.
-- **Passos:**
+- **Passos Realizados:**
   1. **Atualizei o Dockerfile** para incluir variáveis de ambiente:
      ```Dockerfile
      FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
@@ -105,7 +105,7 @@ Este repositório é dedicado ao aprendizado e prática de Docker com um projeto
 ## Dia 5 - Persistindo Dados com Volumes
 
 - **Objetivo:** Configurar volumes para persistir dados fora do contêiner e entender como manter os dados entre reinicializações.
-- **Passos:**
+- **Passos Realizados:**
   1. **Configurei um volume** ao iniciar o contêiner para que os dados sejam persistidos no host:
      ```bash
      docker run -d -p 8080:80 --name meuappcontainer -v $(pwd)/appdata:/app/data meuappdocker
@@ -121,3 +121,53 @@ Este repositório é dedicado ao aprendizado e prática de Docker com um projeto
      docker run -d -p 8080:80 --name meuappcontainer -v $(pwd)/appdata:/app/data meuappdocker
      ```
   5. O arquivo `teste.txt` permaneceu na pasta `appdata` no host, confirmando que o volume foi configurado corretamente.
+
+  ## Dia 6 - Conectando Contêineres com Redes Docker
+
+- **Objetivo:** Configurar uma rede Docker personalizada para conectar a aplicação ASP.NET ao contêiner SQL Server.
+- **Passos Realizados:**
+
+  1. **Criei uma rede Docker** para permitir a comunicação entre os contêineres da aplicação e do banco de dados:
+     ```bash
+     docker network create minha-rede-aspnet
+     ```
+
+  2. **Executei o contêiner do SQL Server** e o conectei à rede recém-criada:
+     ```bash
+     docker run -d \
+       --network minha-rede-aspnet \
+       --name sqlserver-container \
+       -e "ACCEPT_EULA=Y" \
+       -e "SA_PASSWORD=MinhaSenhaSegura123" \
+       -p 1433:1433 \
+       mcr.microsoft.com/mssql/server:2019-latest
+     ```
+     - **Nota:** Substituí `MinhaSenhaSegura123` por uma senha segura para o SQL Server.
+
+  3. **Configurei a string de conexão** no arquivo `appsettings.json` da minha aplicação ASP.NET para usar o nome do contêiner SQL Server como servidor:
+     ```json
+     "ConnectionStrings": {
+         "DefaultConnection": "Server=sqlserver-container;Database=MeuBancoDeDados;User Id=sa;Password=MinhaSenhaSegura123;"
+     }
+     ```
+
+  4. **Construí a imagem Docker** da aplicação ASP.NET com o novo `Dockerfile`:
+     ```bash
+     docker build -t meuappaspnet .
+     ```
+
+  5. **Executei o contêiner da aplicação** e o conectei à mesma rede do SQL Server:
+     ```bash
+     docker run -d \
+       --network minha-rede-aspnet \
+       -p 5000:80 \
+       --name meuapp-container \
+       meuappaspnet
+     ```
+     - Assim, configurei a aplicação para estar acessível na porta `5000` do meu host.
+
+  6. **Teste de comunicação**: Para garantir que os contêineres estavam se comunicando, usei o comando `ping` no contêiner da aplicação para verificar se ele conseguia alcançar o contêiner SQL Server:
+     ```bash
+     docker exec -it meuapp-container ping sqlserver-container
+     ```
+     - Como o `ping` respondeu normalmente, confirmei que a comunicação entre os contêineres estava funcionando.
